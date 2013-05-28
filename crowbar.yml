@@ -48,3 +48,22 @@ locale_additions:
           postgresql_max_connections: Global Connection Limit (max_connections)
         edit_deployment:
           deployment: Deployment
+debs:
+  build_pkgs:
+    - libpq-dev
+    - postgresql-server-dev-9.1
+  pkgs:
+    # postgresql stuff
+    - postgresql
+    - postgresql-client
+rpms:
+  build_pkgs:
+    - postgresql-devel
+  pkgs:
+    # postgresql stuff
+    - postgresql-libs
+    - postgresql
+    - postgresql-server
+gems:
+  pkgs:
+    - pg

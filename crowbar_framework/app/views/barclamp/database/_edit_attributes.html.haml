@@ -1,24 +1,27 @@
 
 %input#proposal_attributes{:type => "hidden", :name => "proposal_attributes", :value => @proposal.raw_data['attributes'][@proposal.barclamp].to_json}
-%p
-  %label{:class => "h3", :for => "proposal_attributes"}= t('.attributes')
-  = link_to t('raw'), proposal_barclamp_path(:id => @proposal.name, :controller => @proposal.barclamp, :dep_raw => @dep_raw, :attr_raw => true), :style => "float: right;"
-  %div.container
-    %p
-      %label{ :for => :sql_engine }= t('.sql_engine')
-      = select_tag :sql_engine, options_for_select([['MySQL','mysql'],['PostgreSQL','postgresql']], @proposal.raw_data['attributes'][@proposal.barclamp]["sql_engine"]), :onchange => "update_value('sql_engine', 'sql_engine', 'string')"
 
-  %label.section-header.mysql_engine.sql_engine{ :for => :mysql_form }= t('.mysql_attributes')
-  %div.section.mysql_engine.sql_engine{ :id => :mysql_form }
-    %p
-      %label{ :for => :mysql_datadir }= t('.mysql_datadir')
-      %input#mysql_datadir{:type => "text", :name => "mysql_datadir", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["mysql"]["datadir"], :onchange => "update_value('mysql/datadir', 'mysql_datadir', 'string')"}
+%h3.page-header
+  = t('.attributes')
+  = link_to t('raw'), proposal_barclamp_path(:id => @proposal.name, :controller => @proposal.barclamp, :dep_raw => @dep_raw, :attr_raw => true), :class => "pull-right"
+.page-header-bottom
 
-  %label.section-header.postgresql_engine.sql_engine{ :for => :postgresql_form }= t('.postgresql_attributes')
-  %div.section.postgresql_engine.sql_engine{ :id => :postgresql_form }
-    %p
-      %label{ :for => :postgresql_max_connections }= t('.postgresql_max_connections')
-      %input#postgresql_max_connections{:type => "text", :name => "postgresql_max_connections", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["postgresql"]["max_connections"], :onchange => "update_value('postgresql/tunable/max_connections', 'postgresql_max_connections', 'string')"}
+%div
+  %p
+    %label{ :for => :sql_engine }= t('.sql_engine')
+    = select_tag :sql_engine, options_for_select([['MySQL','mysql'],['PostgreSQL','postgresql']], @proposal.raw_data['attributes'][@proposal.barclamp]["sql_engine"]), :onchange => "update_value('sql_engine', 'sql_engine', 'string')"
+
+%label.section-header.mysql_engine.sql_engine{ :for => :mysql_form }= t('.mysql_attributes')
+%div.section.mysql_engine.sql_engine{ :id => :mysql_form }
+  %p
+    %label{ :for => :mysql_datadir }= t('.mysql_datadir')
+    %input#mysql_datadir{:type => "text", :name => "mysql_datadir", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["mysql"]["datadir"], :onchange => "update_value('mysql/datadir', 'mysql_datadir', 'string')"}
+
+%label.section-header.postgresql_engine.sql_engine{ :for => :postgresql_form }= t('.postgresql_attributes')
+%div.section.postgresql_engine.sql_engine{ :id => :postgresql_form }
+  %p
+    %label{ :for => :postgresql_max_connections }= t('.postgresql_max_connections')
+    %input#postgresql_max_connections{:type => "text", :name => "postgresql_max_connections", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["postgresql"]["max_connections"], :onchange => "update_value('postgresql/tunable/max_connections', 'postgresql_max_connections', 'string')"}
 
 
 :javascript

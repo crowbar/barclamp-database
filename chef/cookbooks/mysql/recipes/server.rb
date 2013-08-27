@@ -106,7 +106,8 @@ template "#{node[:mysql][:datadir]}/my.cnf" do
   owner "root"
   group "root"
   mode "0644"
-  notifies :run, resources(:script => "handle mysql restart"), :immediately
+   notifies :run, resources(:script => "handle mysql restart"), :immediately if platform?(%w{debian ubuntu})
+   notifies :restart, "service[mysql]", :immediately if platform?(%w{centos redhat suse})
 end
 
 unless Chef::Config[:solo]

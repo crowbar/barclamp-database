@@ -1,12 +1,10 @@
-#/postgresql.conf.
+#
 # Cookbook Name:: postgresql
 # Recipe:: server
 #
 # Author:: Joshua Timberman (<joshua@opscode.com>)
 # Author:: Lamont Granquist (<lamont@opscode.com>)
-# Author:: Ralf Haferkamp (<rhafer@suse.com>)
 # Copyright 2009-2011, Opscode, Inc.
-# Copyright 2012, SUSE
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,104 +18,75 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
- 
-::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
- 
-include_recipe "postgresql::client"
- 
-# randomly generate postgres password
-node.set_unless[:postgresql][:password][:postgres] = secure_password
-node.save unless Chef::Config[:solo]
- 
-case node[:postgresql][:version]
-when "8.3"
-  node.default[:postgresql][:ssl] = "off"
-when "8.4"
-  node.default[:postgresql][:ssl] = "true"
-end
 
-# For Crowbar, we need to set the address to bind - default to admin node.
-addr = node.default['postgresql']['listen_addresses'] || ""
-#newaddr = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").address
-newaddr = "localhost"
-if addr != newaddr
-  node.default['postgresql']['listen_addresses'] = newaddr
-  node.save unless Chef::Config[:solo]
-end
-# We also need to add the network + mask to give access to other nodes
-# in pg_hba.conf
-netaddr = node.default['postgresql']['network_address'] || ""
-netmask = node.default['postgresql']['network_mask'] || ""
-#newnetaddr = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").subnet
-#newnetmask = Chef::Recipe::Barclamp::Inventory.get_network_by_type(node, "admin").netmask
-newnetaddr="192.168.124.0"
-newnetmask="255.255.255.0"
-if netaddr != newnetaddr or netmask != newnetmask
-  node.default['postgresql']['network_address'] = newnetaddr
-  node.default['postgresql']['network_mask'] = newnetmask
-  node.save  unless Chef::Config[:solo]
+::Chef::Recipe.send(:include, Opscode::OpenSSL::Password)
+
+include_recipe "postgresql::client"
+
+# randomly generate postgres password, unless using solo - see README
+if Chef::Config[:solo]
+  missing_attrs = %w{
+    postgres
+  }.select do |attr|
+    node['postgresql']['password'][attr].nil?
+  end.map { |attr| "node['postgresql']['password']['#{attr}']" }
+
+  if !missing_attrs.empty?
+    Chef::Application.fatal!([
+        "You must set #{missing_attrs.join(', ')} in chef-solo mode.",
+        "For more information, see https://github.com/opscode-cookbooks/postgresql#chef-solo-note"
+      ].join(' '))
+  end
+else
+  # TODO: The "secure_password" is randomly generated plain text, so it
+  # should be converted to a PostgreSQL specific "encrypted password" if
+  # it should actually install a password (as opposed to disable password
+  # login for user 'postgres'). However, a random password wouldn't be
+  # useful if it weren't saved as clear text in Chef Server for later
+  # retrieval.
+  node.set_unless['postgresql']['password']['postgres'] = secure_password
+  node.save
 end
 
 # Include the right "family" recipe for installing the server
 # since they do things slightly differently.
-case node.platform
-when "redhat", "centos", "fedora", "suse", "scientific", "amazon"
+case node['platform_family']
+when "rhel", "fedora", "suse"
   include_recipe "postgresql::server_redhat"
-when "debian", "ubuntu"
+when "debian"
   include_recipe "postgresql::server_debian"
 end
- 
-template "#{node[:postgresql][:dir]}/pg_hba.conf" do
-  source "pg_hba.conf.erb"
+
+change_notify = node['postgresql']['server']['config_change_notify']
+
+template "#{node['postgresql']['dir']}/postgresql.conf" do
+  source "postgresql.conf.erb"
   owner "postgres"
   group "postgres"
   mode 0600
-  if (node[:postgresql][:version] == "8.3")
-    variables( :ident => "sameuser" )
-  else
-    variables( :ident => "" )
-  end
-  notifies :reload, resources(:service => "postgresql"), :immediately
+  notifies change_notify, 'service[postgresql]', :immediately
 end
- 
-# Default PostgreSQL install has 'ident' checking on unix user 'postgres'
-# and 'md5' password checking with connections from 'localhost'. This script
-# runs as user 'postgres', so we can execute the 'role' and 'database' resources
-# as 'root' later on, passing the below credentials in the PG client.
+
+template "#{node['postgresql']['dir']}/pg_hba.conf" do
+  source "pg_hba.conf.erb"
+  owner "postgres"
+  group "postgres"
+  mode 00600
+  notifies change_notify, 'service[postgresql]', :immediately
+end
+
+# NOTE: Consider two facts before modifying "assign-postgres-password":
+# (1) Passing the "ALTER ROLE ..." through the psql command only works
+#     if passwordless authorization was configured for local connections.
+#     For example, if pg_hba.conf has a "local all postgres ident" rule.
+# (2) It is probably fruitless to optimize this with a not_if to avoid
+#     setting the same password. This chef recipe doesn't have access to
+#     the plain text password, and testing the encrypted (md5 digest)
+#     version is not straight-forward.
 bash "assign-postgres-password" do
   user 'postgres'
   code <<-EOH
-echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{node[:postgresql][:password][:postgres]}';" | psql
+echo "ALTER ROLE postgres ENCRYPTED PASSWORD '#{node['postgresql']['password']['postgres']}';" | psql
   EOH
-#  not_if do
-#    begin
-#     require 'rubygems'
-#      Gem.clear_paths
-#      require 'pg'
-#      conn = PGconn.connect(:host => newaddr, :port => 5432, :dbname => "postgres", :user => "postgres", :password =>  node['postgresql']['password']['postgres'])
-#    rescue PGError
-#      false
-#    end
-#  end
-  action :run
-end
-
-# For Crowbar we also need the "db_maker" user
-bash "assign-db_maker-password" do
-  user 'postgres'
-  code <<-EOH
-echo "CREATE ROLE db_maker WITH LOGIN CREATEDB CREATEROLE ENCRYPTED PASSWORD '#{node[:database][:db_maker_password]}';
-ALTER ROLE db_maker ENCRYPTED PASSWORD '#{node[:database][:db_maker_password]}';" | psql
-  EOH
-#  not_if do
-#    begin
-#      require 'rubygems'
-#      Gem.clear_paths
-#      require 'pg'
-#      conn = PGconn.connect(:host => newaddr, :port => 5432, :dbname => "postgres", :user => "db_maker", :password => node['postgresql']['db_maker_password'])
-#    rescue PGError
-#      false
-#    end
-#  end
   action :run
 end

@@ -40,10 +40,11 @@ crowbar:
   proposal_schema_version: 2
 
 roles:
-  - name: database-server
+  - name: os-ops-database
     jig: chef-solo
     requires:
       - crowbar-installed-node
+      - os-base
 
 locale_additions:
   en:
@@ -76,6 +77,7 @@ debs:
     - mysql-client
     - libmysql-ruby
     - mysql-server
+    - apparmor-utils
   src_pkgs:
     - mysql-5.5
 rpms:

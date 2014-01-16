@@ -1,0 +1,1 @@
+cookbook 'openstack-ops-database', github: 'stackforge/cookbook-openstack-ops-database'

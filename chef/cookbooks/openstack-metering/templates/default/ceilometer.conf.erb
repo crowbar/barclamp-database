@@ -1,0 +1,66 @@
+[DEFAULT]
+<% if node["openstack"]["metering"]["host"] %>
+host = <%= node["openstack"]["metering"]["host"] %>
+<% end %>
+os_auth_url = <%= @auth_uri %>
+os_tenant_name = <%= @service_tenant_name %>
+os_password = <%= @service_pass %>
+os_username = <%= @service_user %>
+policy_file = /etc/ceilometer/policy.json
+database_connection = <%= @database_connection %>
+verbose = True
+
+notification_topics = notifications,glance_notifications
+<% if node["openstack"]["metering"]["mq"]["service_type"] == "rabbitmq"  %>
+##### RABBITMQ #####
+rabbit_userid = <%= node["openstack"]["metering"]["rabbit"]["username"] %>
+rabbit_password = <%= @rabbit_pass %>
+rabbit_port = <%= node["openstack"]["metering"]["rabbit"]["port"] %>
+rabbit_host = <%= node["openstack"]["metering"]["rabbit"]["host"] %>
+rabbit_virtual_host = <%= node["openstack"]["metering"]["rabbit"]["vhost"] %>
+rpc_backend = ceilometer.openstack.common.rpc.impl_kombu
+<% end %>
+
+
+<% if node["openstack"]["metering"]["mq"]["service_type"] == "qpid"  %>
+##### QPID #####
+rpc_backend=nova.openstack.common.rpc.impl_qpid
+qpid_hostname=<%= node["openstack"]["metering"]["mq"]["qpid"]["host"] %>
+qpid_port=<%= node["openstack"]["metering"]["mq"]["qpid"]["port"] %>
+
+qpid_password=<%= node["openstack"]["metering"]["mq"]["qpid"]["password"] %>
+qpid_username=<%= node["openstack"]["metering"]["mq"]["qpid"]["username"] %>
+qpid_sasl_mechanisms=<%= node["openstack"]["metering"]["mq"]["qpid"]["sasl_mechanisms"] %>
+qpid_reconnect=<%= node["openstack"]["metering"]["mq"]["qpid"]["reconnect"] %>
+qpid_reconnect_timeout=<%= node["openstack"]["metering"]["mq"]["qpid"]["reconnect_timeout"] %>
+qpid_reconnect_limit=<%= node["openstack"]["metering"]["mq"]["qpid"]["reconnect_limit"] %>
+qpid_reconnect_interval_min=<%= node["openstack"]["metering"]["mq"]["qpid"]["reconnect_interval_min"] %>
+qpid_reconnect_interval_max=<%= node["openstack"]["metering"]["mq"]["qpid"]["reconnect_interval_max"] %>
+qpid_reconnect_interval=<%= node["openstack"]["metering"]["mq"]["qpid"]["reconnect_interval"] %>
+qpid_heartbeat=<%= node["openstack"]["metering"]["mq"]["qpid"]["heartbeat"] %>
+# qpid protocol. default 'tcp'. set to 'ssl' to enable SSL
+qpid_protocol=<%= node["openstack"]["metering"]["mq"]["qpid"]["protocol"] %>
+qpid_tcp_nodelay=<%= node["openstack"]["metering"]["mq"]["qpid"]["tcp_nodelay"] %>
+
+<% end %>
+
+
+<% if node["openstack"]["metering"]["syslog"]["use"] %>
+log_config = /etc/openstack/logging.conf
+<% end %>
+<% if node["openstack"]["metering"]["debug"] %>
+debug = True
+<% end %>
+glance_registry_host = <%= @image_endpoint.host %>
+periodic_interval = <%= node["openstack"]["metering"]["periodic_interval"] %>
+
+[keystone_authtoken]
+paste.filter_factory = keystoneclient.middleware.auth_token:filter_factory
+auth_uri = <%= @identity_endpoint.to_s %>
+auth_host = <%= @identity_admin_endpoint.host %>
+auth_port = <%= @identity_admin_endpoint.port %>
+auth_protocol = <%= @identity_admin_endpoint.scheme %>
+admin_tenant_name = <%= @service_tenant_name %>
+admin_user = <%= @service_user %>
+admin_password = <%= @service_pass %>
+signing_dir = <%= node["openstack"]["metering"]["api"]["auth"]["cache_dir"] %>

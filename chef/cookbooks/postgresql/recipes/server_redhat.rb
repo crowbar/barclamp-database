@@ -18,16 +18,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
- 
+
 include_recipe "postgresql::client"
- 
+
 # Create a group and user like the package will.
 # Otherwise the templates fail.
- 
+
 group "postgres" do
   gid 26
 end
- 
+
 user "postgres" do
   shell "/bin/bash"
   comment "PostgreSQL Server"
@@ -37,51 +37,36 @@ user "postgres" do
   uid 26
   supports :manage_home => false
 end
- 
-package "postgresql" do
-  case node.platform
-  when "redhat","centos","scientific"
-    case
-    when node.platform_version.to_f >= 6.0
-      package_name "postgresql"
-    else
-      package_name "postgresql#{node['postgresql']['version'].split('.').join}"
-    end
-  when "suse"
-    package_name "postgresql91"
-  else
-    package_name "postgresql"
-  end
-end
- 
-case node.platform
-when "redhat","centos","scientific"
-  case
-  when node.platform_version.to_f >= 6.0
-    package "postgresql-server"
-  else
-    package "postgresql#{node['postgresql']['version'].split('.').join}-server"
-  end
-when "suse"
-  package "postgresql91-server"
-when "fedora"
-  package "postgresql-server"
-end
- 
-execute "/sbin/service postgresql initdb" do
-  not_if { node.platform == "suse" or
-           ::FileTest.exist?(File.join(node.postgresql.dir, "PG_VERSION")) }
-end
- 
-service "postgresql" do
-  supports :restart => true, :status => true, :reload => true
-  action [:enable, :start]
-end
- 
-template "#{node[:postgresql][:dir]}/postgresql.conf" do
-  source "redhat.postgresql.conf.erb"
+
+directory node['postgresql']['dir'] do
   owner "postgres"
   group "postgres"
-  mode 0600
-  notifies :restart, resources(:service => "postgresql")
+  recursive true
+  action :create
+end
+
+node['postgresql']['server']['packages'].each do |pg_pack|
+
+  package pg_pack
+
+end
+
+template "/etc/sysconfig/pgsql/#{node['postgresql']['server']['service_name']}" do
+  source "pgsql.sysconfig.erb"
+  mode "0644"
+  notifies :restart, "service[postgresql]", :delayed
+end
+
+unless platform_family?("suse")
+
+  execute "/sbin/service #{node['postgresql']['server']['service_name']} initdb #{node['postgresql']['initdb_locale']}" do
+    not_if { ::FileTest.exist?(File.join(node['postgresql']['dir'], "PG_VERSION")) }
+  end
+
+end
+
+service "postgresql" do
+  service_name node['postgresql']['server']['service_name']
+  supports :restart => true, :status => true, :reload => true
+  action [:enable, :start]
 end

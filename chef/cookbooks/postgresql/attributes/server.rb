@@ -74,4 +74,4 @@ else
   set[:postgresql][:dir]         = "/etc/postgresql/#{node[:postgresql][:version]}/main"
 end
 
-default[:postgresql][:tunable][:max_connections] = "1000"
+default[:postgresql][:max_connections] = "1000"

@@ -18,7 +18,7 @@
   %div.section.postgresql_engine.sql_engine{ :id => :postgresql_form }
     %p
       %label{ :for => :postgresql_max_connections }= t('.postgresql_max_connections')
-      %input#postgresql_max_connections{:type => "text", :name => "postgresql_max_connections", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["postgresql"]["max_connections"], :onchange => "update_value('postgresql/tunable/max_connections', 'postgresql_max_connections', 'string')"}
+      %input#postgresql_max_connections{:type => "text", :name => "postgresql_max_connections", :'data-default' => @proposal.raw_data['attributes'][@proposal.barclamp]["postgresql"]["max_connections"], :onchange => "update_value('postgresql/max_connections', 'postgresql_max_connections', 'integer')"}
 
 
 :javascript

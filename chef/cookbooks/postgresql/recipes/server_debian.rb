@@ -27,30 +27,17 @@ when "8.3"
 else # > 8.3
   node.default[:postgresql][:ssl] = "true"
 end
+
+execute "tune-shmmax" do
+  command "sysctl -w kernel.shmmax=2147483648"
+  action :run
+end
  
 package "postgresql"
  
 service "postgresql" do
-  case node['platform']
-  when "ubuntu"
-    case
-    when node['platform_version'].to_f <= 10.04
-      service_name "postgresql-#{node['postgresql']['version']}"
-    else
-      service_name "postgresql"
-    end
-  when "debian"
-    case
-    when platform_version.to_f <= 5.0
-      service_name "postgresql-#{node['postgresql']['version']}"
-    when platform_version =~ /squeeze/
-      service_name "postgresql"
-    else
-      service_name "postgresql"
-    end
-  end
-  supports :restart => true, :status => true, :reload => true
-  action :nothing
+  supports :restart => true, :status => false, :reload => true
+  action [:enable, :start]
 end
  
 template "#{node[:postgresql][:dir]}/postgresql.conf" do

@@ -30,7 +30,7 @@ barclamp:
   os_support:
     - ubuntu-12.04
   member:
-    - openstack
+    - openstack                                                                                              hi
 
 crowbar:
   layout: 2.0
@@ -40,12 +40,14 @@ crowbar:
   proposal_schema_version: 2
 
 roles:
-  - name: os-ops-database
+  - name: database-server
     jig: chef-solo
     requires:
       - crowbar-installed-node
+      - provisioner-server
       - os-base
-
+    wants-attribs:
+      - provisioner-webserver
 locale_additions:
   en:
     nav:

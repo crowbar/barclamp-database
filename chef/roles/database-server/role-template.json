@@ -1,0 +1,7 @@
+{
+"mysql":{
+    "server_root_password": "crowbar",
+    "server_repl_password": "crowbar",
+    "server_debian_password": "crowbar"
+   }
+}

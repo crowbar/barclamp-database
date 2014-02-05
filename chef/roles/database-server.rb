@@ -1,8 +1,8 @@
 name "database-server"
-description "Database Server Role"
+description "Currently MySQL Server (non-ha)"
 run_list(
-         "recipe[database::server]"
+    "role[os-base]",
+    "recipe[openstack-ops-database::server]"
 )
 default_attributes()
 override_attributes()
-

@@ -1,3 +1,4 @@
+# encoding: UTF-8
 #
 # Cookbook Name:: openstack-ops-database
 # Recipe:: postgresql-server
@@ -20,13 +21,13 @@
 # limitations under the License.
 #
 
-class ::Chef::Recipe
+class ::Chef::Recipe # rubocop:disable Documentation
   include ::Openstack
 end
 
-listen_address = address_for node["openstack"]["db"]["bind_interface"]
+listen_address = address_for node['openstack']['db']['bind_interface']
 
-node.override["postgresql"]["config"]["listen_addresses"] = listen_address
+node.override['postgresql']['config']['listen_addresses'] = listen_address
 
-include_recipe "openstack-ops-database::postgresql-client"
-include_recipe "postgresql::server"
+include_recipe 'openstack-ops-database::postgresql-client'
+include_recipe 'postgresql::server'

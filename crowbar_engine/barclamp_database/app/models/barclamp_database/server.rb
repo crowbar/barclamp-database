@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-class BarclampDatabase::Server < Role
+class BarclampDatabase::Server < BarclampChef::Role
   include BarclampOpenstack
   def random_password(size = 12)
     chars = (('a'..'z').to_a + ('0'..'9').to_a) - %w(o 0 O i 1 l)

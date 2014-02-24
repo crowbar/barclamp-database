@@ -44,7 +44,7 @@ roles:
     requires:
       - crowbar-installed-node
       - provisioner-server
-      - os-base
+      - openstack-base
 
 locale_additions:
   en:

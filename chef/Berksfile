@@ -1,1 +1,2 @@
+cookbook 'openstack-common', path: '../../openstack/chef-solo/cookbooks/openstack-common'
 cookbook 'openstack-ops-database', path: 'cookbooks/openstack-ops-database'

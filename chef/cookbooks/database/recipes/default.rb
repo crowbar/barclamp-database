@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 #
 # Author:: Joshua Timberman (<joshua@opscode.com>)
 # Cookbook Name:: database

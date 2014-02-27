@@ -1,23 +1,21 @@
-- register_javascripts "barclamps/database/form"
-
 = attributes_for @proposal do
   .panel-sub
     = header @dep_raw, true
 
   .panel-body
-    = select_field :sql_engine, :collection => :engines_for_database
+    = select_field :sql_engine, collection: :engines_for_database, data: { showit: "mysql;postgresql", showit_target: "#mysql_container;#postgresql_container", showit_direct: "true" }
 
     #mysql_container
       %fieldset
         %legend
-          = t('.mysql_attributes')
+          = t(".mysql_attributes")
 
         = string_field %w(mysql datadir)
 
     #postgresql_container
       %fieldset
         %legend
-          = t('.postgresql_attributes')
+          = t(".postgresql_attributes")
 
         = string_field %w(postgresql max_connections)
 

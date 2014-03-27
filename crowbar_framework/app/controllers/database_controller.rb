@@ -17,7 +17,10 @@
 #
 
 class DatabaseController < BarclampController
-  def initialize
+
+  protected
+
+  def initialize_service
     @service_object = DatabaseService.new logger
   end
 end

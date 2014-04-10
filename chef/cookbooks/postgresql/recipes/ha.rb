@@ -40,11 +40,13 @@ postgres_op["monitor"]["interval"] = "10s"
 # resources
 crowbar_pacemaker_sync_mark "sync-database_before_ha" do
   revision node[:database]["crowbar-revision"]
+  fatal true
 end
 
 # Avoid races when creating pacemaker resources
 crowbar_pacemaker_sync_mark "wait-database_ha_resources" do
   revision node[:database]["crowbar-revision"]
+  fatal true
 end
 
 pacemaker_primitive vip_primitive do
@@ -116,6 +118,7 @@ end
 
 crowbar_pacemaker_sync_mark "create-database_ha_resources" do
   revision node[:database]["crowbar-revision"]
+  fatal true
 end
 
 # wait for service to be active, and really ready before we go on (because we

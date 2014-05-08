@@ -7,7 +7,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#   http://www.apache.org/licenses/LICENSE-2.0
+#  http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,24 +16,26 @@
 # limitations under the License.
 #
 
-module DatabaseBarclampHelper
-  def engines_for_database(selected)
-    options_for_select(
-      [
-        ["MySQL","mysql"],
-        ["PostgreSQL","postgresql"]
-      ],
-      selected.to_s
-    )
-  end
+module Barclamp
+  module DatabaseHelper
+    def engines_for_database(selected)
+      options_for_select(
+        [
+          ["MySQL","mysql"],
+          ["PostgreSQL","postgresql"]
+        ],
+        selected.to_s
+      )
+    end
 
-  def ha_storage_mode_for_database(selected)
-    options_for_select(
-      [
-        [t(".ha.storage.modes.drbd"), "drbd"],
-        [t(".ha.storage.modes.shared"), "shared"]
-      ],
-      selected.to_s
-    )
+    def ha_storage_mode_for_database(selected)
+      options_for_select(
+        [
+          [t(".ha.storage.modes.drbd"), "drbd"],
+          [t(".ha.storage.modes.shared"), "shared"]
+        ],
+        selected.to_s
+      )
+    end
   end
 end

@@ -16,14 +16,14 @@
 #
 
 barclamp:
-  name: database
-  display: Database
-  description: Resource for accessing Database Servers
+  name: 'database'
+  display: 'Database'
+  description: 'Resource for accessing Database Servers'
   version: 0
-  requires:
-    - pacemaker
   member:
-    - openstack
+    - 'openstack'
+  requires:
+    - 'pacemaker'
 
 crowbar:
   layout: 1
@@ -34,34 +34,34 @@ crowbar:
 
 debs:
   build_pkgs:
-    - libpq-dev
-    - postgresql-server-dev-9.1
-    - libmysqlclient-dev
+    - 'libpq-dev'
+    - 'postgresql-server-dev-9.1'
+    - 'libmysqlclient-dev'
   pkgs:
-    - postgresql
-    - postgresql-client
-    - libmysqlclient-dev
-    - mysql-client
-    - libmysql-ruby
-    - mysql-server
+    - 'postgresql'
+    - 'postgresql-client'
+    - 'libmysqlclient-dev'
+    - 'mysql-client'
+    - 'libmysql-ruby'
+    - 'mysql-server'
   src_pkgs:
-    - mysql-5.5
+    - 'mysql-5.5'
 
 rpms:
   build_pkgs:
-    - postgresql-devel
-    - mysql-devel
+    - 'postgresql-devel'
+    - 'mysql-devel'
   pkgs:
-    - postgresql-libs
-    - postgresql
-    - postgresql-server
-    - mysql-devel
-    - mysql
-    - ruby-mysql
-    - mysql-server
-    - python-psycopg2
+    - 'postgresql-libs'
+    - 'postgresql'
+    - 'postgresql-server'
+    - 'mysql-devel'
+    - 'mysql'
+    - 'ruby-mysql'
+    - 'mysql-server'
+    - 'python-psycopg2'
 
 gems:
   pkgs:
-    - pg
-    - mysql
+    - 'pg'
+    - 'mysql'

@@ -23,4 +23,8 @@ class DatabaseController < BarclampController
   def initialize_service
     @service_object = DatabaseService.new logger
   end
+
+  def permitted_params
+    params.require(:database)
+  end
 end

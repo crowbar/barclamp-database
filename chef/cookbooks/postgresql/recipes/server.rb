@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 #/postgresql.conf.
 # Cookbook Name:: postgresql
 # Recipe:: server

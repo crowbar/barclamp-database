@@ -1,36 +1,34 @@
-- register_javascripts "barclamps/database/form"
-
 = attributes_for @proposal do
   .panel-sub
-    = header @dep_raw, true
+    = header dep_raw, true
 
   .panel-body
-    = select_field :sql_engine, :collection => :engines_for_database
+    = select_field :sql_engine, collection: :engines_for_database, data: { showit: "mysql;postgresql", showit_target: "#mysql_container;#postgresql_container", showit_direct: "true" }
 
     #mysql_container
       %fieldset
         %legend
-          = t('.mysql_attributes')
+          = t(".mysql_attributes")
 
         = string_field %w(mysql datadir)
 
     #postgresql_container
       %fieldset
         %legend
-          = t('.postgresql_attributes')
+          = t(".postgresql_attributes")
 
         = string_field %w(postgresql max_connections)
 
       -# As HA is only supported for postgresql, we put this section in #postgresql_container
       %fieldset#ha-setup{ "data-show-for-clusters-only" => "true", "data-elements-path" => "database-server" }
         %legend
-          = t('.ha_header')
+          = t(".ha_header")
 
-        = select_field %w(ha storage mode), :collection => :ha_storage_mode_for_database, "data-showit" => ["drbd", "shared"].join(";"), "data-showit-target" => "#drbd_storage_container;#shared_storage_container", "data-showit-direct" => "true"
+        = select_field %w(ha storage mode), collection: :ha_storage_mode_for_database, data: { showit: ["drbd", "shared"].join(";"), showit_target: "#drbd_storage_container;#shared_storage_container", showit_direct: "true" }
 
         #drbd_storage_container
           .alert.alert-info
-            = t('.ha.storage.drbd_info')
+            = t(".ha.storage.drbd_info")
           = integer_field %w(ha storage drbd size)
 
         #shared_storage_container

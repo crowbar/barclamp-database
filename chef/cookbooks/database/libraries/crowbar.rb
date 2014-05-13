@@ -1,3 +1,4 @@
+# -*- encoding : utf-8 -*-
 module CrowbarDatabaseHelper
   def self.get_ha_vhostname(node)
     if node[:database][:ha][:enabled]

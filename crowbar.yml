@@ -1,11 +1,12 @@
-# Copyright 2012, Dell
-# Copyright 2012, SUSE
+#
+# Copyright 2011-2013, Dell
+# Copyright 2013-2014, SUSE LINUX Products GmbH
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#   http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,19 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Author: RobHirschfeld
-# Author: Ralf Haferkamp <rhafer@suse.com>
-#
 
 barclamp:
-  name: database
-  display: Database
-  description: Resource for accessing Database Servers
+  name: 'database'
+  display: 'Database'
+  description: 'Resource for accessing Database Servers'
   version: 0
-  requires:
-    - pacemaker
   member:
-    - openstack
+    - 'openstack'
+  requires:
+    - 'pacemaker'
 
 crowbar:
   layout: 1
@@ -36,38 +34,34 @@ crowbar:
 
 debs:
   build_pkgs:
-    - libpq-dev
-    - postgresql-server-dev-9.1
-    - libmysqlclient-dev
+    - 'libpq-dev'
+    - 'postgresql-server-dev-9.1'
+    - 'libmysqlclient-dev'
   pkgs:
-    # postgresql stuff
-    - postgresql
-    - postgresql-client
-    # mysql stuff
-    - libmysqlclient-dev
-    - mysql-client
-    - libmysql-ruby
-    - mysql-server
+    - 'postgresql'
+    - 'postgresql-client'
+    - 'libmysqlclient-dev'
+    - 'mysql-client'
+    - 'libmysql-ruby'
+    - 'mysql-server'
   src_pkgs:
-    - mysql-5.5
+    - 'mysql-5.5'
 
 rpms:
   build_pkgs:
-    - postgresql-devel
-    - mysql-devel
+    - 'postgresql-devel'
+    - 'mysql-devel'
   pkgs:
-    # postgresql stuff
-    - postgresql-libs
-    - postgresql
-    - postgresql-server
-    # mysql stuff
-    - mysql-devel
-    - mysql
-    - ruby-mysql
-    - mysql-server
-    - python-psycopg2
+    - 'postgresql-libs'
+    - 'postgresql'
+    - 'postgresql-server'
+    - 'mysql-devel'
+    - 'mysql'
+    - 'ruby-mysql'
+    - 'mysql-server'
+    - 'python-psycopg2'
 
 gems:
   pkgs:
-    - pg
-    - mysql
+    - 'pg'
+    - 'mysql'

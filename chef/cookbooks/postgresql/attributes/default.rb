@@ -158,7 +158,7 @@ end
 #
 # The ssl config attribute is generated in the recipe to avoid awkward
 # merge/precedence order during the Chef run.
-case node['platform_family']
+case node['platform']
 when 'debian'
   default['postgresql']['config']['data_directory'] = "/var/lib/postgresql/#{node['postgresql']['version']}/main"
   default['postgresql']['config']['hba_file'] = "/etc/postgresql/#{node['postgresql']['version']}/main/pg_hba.conf"
@@ -205,7 +205,7 @@ default['postgresql']['pg_hba'] = [
 
 default['postgresql']['password'] = Hash.new
 
-case node['platform_family']
+case node['platform']
 when 'debian'
   default['postgresql']['pgdg']['release_apt_codename'] = node['lsb']['codename']
 end

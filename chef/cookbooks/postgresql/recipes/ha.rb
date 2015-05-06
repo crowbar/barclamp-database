@@ -22,7 +22,11 @@
 #
 # This is the second step.
 
-vip_primitive = "vip-admin-#{CrowbarDatabaseHelper.get_ha_vhostname(node)}"
+vhostname = CrowbarDatabaseHelper.get_ha_vhostname(node)
+
+vip_primitive = "vip-admin-#{vhostname}"
+portblock_primitive = "portblock-admin-#{vhostname}"
+portunblock_primitive = "portunblock-admin-#{vhostname}"
 service_name = "postgresql"
 fs_primitive = "fs-#{service_name}"
 group_name = "g-#{service_name}"
@@ -56,6 +60,30 @@ pacemaker_primitive vip_primitive do
   action :create
 end
 
+pacemaker_primitive portblock_primitive do
+  agent "ocf:heartbeat:portblock"
+  params ({
+    "protocol" => "tcp",
+    "ip" => ip_addr,
+    "portno" => node['postgresql']['config']['port'],
+    "action" => "block"
+  })
+  op postgres_op
+  action :create
+end
+
+pacemaker_primitive portunblock_primitive do
+  agent "ocf:heartbeat:portblock"
+  params ({
+    "protocol" => "tcp",
+    "ip" => ip_addr,
+    "portno" => node['postgresql']['config']['port'],
+    "action" => "unblock"
+  })
+  op postgres_op
+  action :create
+end
+
 # We run the resource agent "ocf:heartbeat:pgsql" without params, instead of
 # something like:
 #  params ({
@@ -79,17 +107,19 @@ pacemaker_primitive service_name do
   action :create
 end
 
+primitives = [fs_primitive, portblock_primitive, vip_primitive, service_name, portunblock_primitive]
+
 if node[:database][:ha][:storage][:mode] == "drbd"
 
   pacemaker_colocation "col-#{service_name}" do
     score "inf"
-    resources [fs_primitive, vip_primitive, service_name]
+    resources primitives
     action :create
   end
 
   pacemaker_order "o-#{service_name}" do
     score "Mandatory"
-    ordering "#{fs_primitive} #{vip_primitive} #{service_name}"
+    ordering primitives.join(" ")
     action :create
     # This is our last constraint, so we can finally start service_name
     notifies :run, "execute[Cleanup #{service_name} after constraints]", :immediately
@@ -108,7 +138,7 @@ else
   pacemaker_group group_name do
     # Membership order *is* significant; VIPs should come first so
     # that they are available for the service to bind to.
-    members [fs_primitive, vip_primitive, service_name]
+    members primitives
     action [ :create, :start ]
   end
 

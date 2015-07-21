@@ -54,6 +54,7 @@ pacemaker_primitive vip_primitive do
   })
   op postgres_op
   action :create
+  only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
 end
 
 # We run the resource agent "ocf:heartbeat:pgsql" without params, instead of
@@ -77,6 +78,7 @@ pacemaker_primitive service_name do
   agent agent_name
   op postgres_op
   action :create
+  only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
 end
 
 if node[:database][:ha][:storage][:mode] == "drbd"
@@ -85,6 +87,7 @@ if node[:database][:ha][:storage][:mode] == "drbd"
     score "inf"
     resources "( #{fs_primitive} #{vip_primitive} ) #{service_name}"
     action :create
+    only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
   end
 
   pacemaker_order "o-#{service_name}" do
@@ -95,6 +98,7 @@ if node[:database][:ha][:storage][:mode] == "drbd"
     notifies :run, "execute[Cleanup #{service_name} after constraints]", :immediately
     notifies :start, "pacemaker_primitive[#{vip_primitive}]", :immediately
     notifies :start, "pacemaker_primitive[#{service_name}]", :immediately
+    only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
   end
 
   # This is needed because we don't create all the pacemaker resources in the
@@ -111,6 +115,7 @@ else
     # that they are available for the service to bind to.
     members [fs_primitive, vip_primitive, service_name]
     action [ :create, :start ]
+    only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
   end
 
 end

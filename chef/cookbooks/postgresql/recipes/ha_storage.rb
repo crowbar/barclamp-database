@@ -93,12 +93,12 @@ if node[:database][:ha][:storage][:mode] == "drbd"
     agent "ocf:linbit:drbd"
     params drbd_params
     op postgres_op
-    # See big comment above as to why we do that. We know that the founder will
-    # go first here, so we only do this on the founder.
+    # See big comment above as to why we do that.
     meta ({
       "is-managed" => "false"
-    }) if (CrowbarPacemakerHelper.is_cluster_founder?(node) && ! ::Kernel.system("crm configure show #{drbd_primitive} &> /dev/null"))
+    }) if (! ::Kernel.system("crm configure show #{drbd_primitive} &> /dev/null"))
     action :create
+    only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
   end
 
   pacemaker_ms ms_name do
@@ -111,6 +111,7 @@ if node[:database][:ha][:storage][:mode] == "drbd"
       "notify" => "true"
     })
     action :create
+    only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
   end
 
   # See big comment above as to why we do that. We know that the founder will
@@ -132,6 +133,7 @@ pacemaker_primitive fs_primitive do
   params fs_params
   op postgres_op
   action :create
+  only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
 end
 
 if node[:database][:ha][:storage][:mode] == "drbd"
@@ -139,6 +141,7 @@ if node[:database][:ha][:storage][:mode] == "drbd"
     score "inf"
     resources "#{fs_primitive} #{ms_name}:Master"
     action :create
+    only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
   end
 
   pacemaker_order "o-#{fs_primitive}" do
@@ -148,6 +151,7 @@ if node[:database][:ha][:storage][:mode] == "drbd"
     # This is our last constraint, so we can finally start fs_primitive
     notifies :run, "execute[Cleanup #{fs_primitive} after constraints]", :immediately
     notifies :start, "pacemaker_primitive[#{fs_primitive}]", :immediately
+    only_if { CrowbarPacemakerHelper.is_cluster_founder?(node) }
   end
 
   # This is needed because we don't create all the pacemaker resources in the

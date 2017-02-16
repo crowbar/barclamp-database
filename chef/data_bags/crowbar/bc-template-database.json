@@ -14,7 +14,7 @@
         "storage": {
           "mode": "shared",
           "drbd": {
-            "size": 50
+            "size": 50.0
           },
           "shared": {
             "device": "",

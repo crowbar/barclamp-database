@@ -60,11 +60,13 @@ end
 # files updated before we create the pacemaker resources.
 crowbar_pacemaker_sync_mark "sync-database_before_ha_storage" do
   revision node[:database]["crowbar-revision"]
+  fatal true
 end
 
 # Avoid races when creating pacemaker resources
 crowbar_pacemaker_sync_mark "wait-database_ha_storage" do
   revision node[:database]["crowbar-revision"]
+  fatal true
 end
 
 if node[:database][:ha][:storage][:mode] == "drbd"
@@ -160,6 +162,7 @@ end
 
 crowbar_pacemaker_sync_mark "create-database_ha_storage" do
   revision node[:database]["crowbar-revision"]
+  fatal true
 end
 
 # wait for fs primitive to be active, and for the directory to be actually
